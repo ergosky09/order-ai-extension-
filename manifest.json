@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Order AI",
+  "version": "1.0",
+  "description": "Siparişlerinizi otomatik olarak yönetmenizi kolaylaştırır",
+  "icons": {
+    "16": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon.png",
+      "48": "images/icon.png",
+      "128": "images/icon.png"
+    }
+  },
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "https://api.keepa.com/*",
+    "https://script.google.com/*"
+  ],
+  "options_page": "options.html",
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://my.easync.io/stores/*/orders/*",
+        "*://www.amazon.com/checkout/*",
+        "*://www.amazon.com/gp/buy/addressselect/*",
+        "*://amazon.com/gp/buy/addressselect/handlers/display.html*",
+        "*://*.amazon.com/gp/css/order-history*",
+        "*://*.amazon.com/gp/your-account/order-history*",
+        "*://*.amazon.com/your-orders*",
+        "*://*.amazon.com/your-orders/orders*",
+        "*://*.amazon.com/gp/your-account/order-details*",
+        "*://*.ebay.com/vod/FetchOrderDetails*",
+        "*://*.ebay.com/ord/*",
+        "*://*.ebay.com/mesh/ord/details*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "update_url": "https://senindomainin.com/updates.xml"
+}

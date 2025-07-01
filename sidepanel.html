@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Order AI - Side Panel</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            width: 350px;
+            padding: 10px;
+            font-size: 13px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .info-list {
+            margin-top: 10px;
+            border: 1px solid #eee;
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+             max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed #ddd;
+        }
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .info-row .label {
+            font-weight: bold;
+            color: #555;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .info-row .value {
+            flex-grow: 1;
+            text-align: left;
+            word-break: break-all;
+            margin-right: 5px;
+        }
+        .copy-btn {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 11px;
+            line-height: 1;
+            margin-left: 5px;
+            flex-shrink: 0;
+        }
+        .copy-btn:hover {
+            background-color: #eee;
+        }
+         .copy-btn.copied {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        #status {
+             margin-top: 10px;
+            font-size: 0.9em;
+            color: grey;
+            text-align: center;
+        }
+        .info-row.hidden {
+            display: none;
+        }
+        .post-order-section {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .post-order-section p {
+             margin-bottom: 4px;
+             margin-top: 4px;
+             color: #555;
+        }
+         .post-order-section a {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e7e9ec;
+            border: 1px solid #adb1b8;
+            border-radius: 3px;
+            color: #0F1111;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Seller Order AI</h3>
+
+    <!-- Sipariş Bilgileri Grubu -->
+    <div class="info-group-container">
+        <div class="info-list" id="infoList">
+            <div class="info-row" id="row-name">
+                <span class="label">Full Name:</span>
+                <span class="value" id="popup-value-name">...</span>
+                <button class="copy-btn" data-target="popup-value-name">📋</button>
+            </div>
+            <div class="info-row" id="row-phone">
+                <span class="label">Phone:</span>
+                <span class="value" id="popup-value-phone"></span>
+                <button class="copy-btn" data-target="popup-value-phone">📋</button>
+            </div>
+            <div class="info-row" id="row-address1">
+                <span class="label">Address 1:</span>
+                <span class="value" id="popup-value-address1">...</span>
+                <button class="copy-btn" data-target="popup-value-address1">📋</button>
+            </div>
+            <div class="info-row hidden" id="row-address2">
+                <span class="label">Address 2:</span>
+                <span class="value" id="popup-value-address2"></span>
+                <button class="copy-btn" data-target="popup-value-address2" title="Kopyala">📋</button>
+            </div>
+            <div class="info-row" id="row-city">
+                <span class="label">City:</span>
+                <span class="value" id="popup-value-city">...</span>
+                <button class="copy-btn" data-target="popup-value-city">📋</button>
+            </div>
+            <div class="info-row" id="row-state">
+                <span class="label">State:</span>
+                <span class="value" id="popup-value-state"></span>
+                <button class="copy-btn" data-target="popup-value-state" title="Kopyala">📋</button>
+            </div>
+            <div class="info-row" id="row-zip">
+                <span class="label">ZIP Code:</span>
+                <span class="value" id="popup-value-zip">...</span>
+                <button class="copy-btn" data-target="popup-value-zip" title="Kopyala">📋</button>
+            </div>
+            <div class="info-row" id="row-country">
+                <span class="label">Country:</span>
+                <span class="value" id="popup-value-country">...</span>
+                <button class="copy-btn" data-target="popup-value-country">📋</button>
+            </div>
+            <div class="info-row" id="row-asin">
+                <span class="label">ASIN:</span>
+                <span class="value" id="popup-value-asin">...</span>
+                <button class="copy-btn" data-target="popup-value-asin">📋</button>
+            </div>
+             <div class="info-row" id="row-quantity">
+                <span class="label">Quantity:</span>
+                <span class="value" id="popup-value-quantity">...</span>
+                <button class="copy-btn" data-target="popup-value-quantity">📋</button>
+            </div>
+            <div class="info-row" id="row-easync-url">
+                <span class="label">Easync URL:</span>
+                <span class="value" id="popup-value-easync-url">...</span>
+                 <button class="copy-btn" data-target-href="popup-value-easync-url">📋</button>
+            </div>
+            <div class="info-row" id="row-ebay-url">
+                <span class="label">eBay Search:</span>
+                <span class="value" id="popup-value-ebay-url">...</span>
+                 <button class="copy-btn" data-target-href="popup-value-ebay-url">📋</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="status">Veriler yükleniyor...</div>
+
+    <!-- eBay Bilgileri Bölümü -->
+    <div class="ebay-section">
+        <button id="get-ebay-details" class="primary-button">eBay Bilgilerini Al</button>
+        
+        <div class="group-container">
+            <div class="info-group">
+                <div class="info-row">
+                    <label>Sipariş Toplamı:</label>
+                    <div class="value-container">
+                        <input type="text" id="ebay-order-total" class="editable-input" placeholder="$0.00">
+                        <button class="copy-button" data-target="ebay-order-total">📋</button>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <label>eBay'den Net Gelen:</label>
+                    <div class="value-container">
+                        <input type="text" id="ebay-earnings" class="editable-input" placeholder="$0.00">
+                        <button class="copy-button" data-target="ebay-earnings">📋</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amazon İşlemleri Grubu -->
+    <div class="amazon-actions-group" style="margin-top: 15px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; width: 90%; margin-left: auto; margin-right: auto;">
+        <!-- Ana Amazon Butonu -->
+        <button id="fill-amazon-form" class="primary-button" style="width: 100%; margin-bottom: 8px;">
+            Amazon Adres Formunu Doldur
+        </button>
+
+        <!-- Amazon Sipariş İşlemleri -->
+        <div style="font-size: 12px; color: #666; text-align: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e9ecef;">
+            <p style="margin: 0 0 6px 0;">Siparişi Amazon'da oluşturduktan sonra:</p>
+            
+            <!-- Amazon Sipariş Sayfası Linki -->
+            <button id="go-to-amazon-orders-btn" class="primary-button" style="width: 100%; margin-bottom: 6px;">
+                Amazon Sipariş Sayfasına Git
+            </button>
+            <span style="font-size: 11px; color: #666; display: block; margin-bottom: 8px;">
+                (Sipariş no ve takip linkini almak için)
+            </span>
+
+            <!-- Sipariş Detayları Butonu -->
+            <button id="find-amazon-order-details" class="primary-button" style="width: 100%;" disabled>
+                Amazon Sipariş Detaylarını Bul
+            </button>
+            <div id="amazon-order-results" style="margin-top: 6px; font-size: 12px; text-align: left;">
+                <!-- Amazon sipariş detayları buraya eklenecek -->
+            </div>
+
+            <!-- Kar Hesaplama Bölümü -->
+            <div id="profit-section" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e9ecef;">
+                <button id="calculate-profit-btn" class="primary-button" style="width: 100%;">Kar Hesapla</button>
+                <div class="info-row hidden" id="row-profit" style="margin-top: 8px;">
+                    <span class="label" style="font-size: 14px; color: #1a73e8;">Kâr:</span>
+                    <span class="value" id="profit-value" style="font-size: 14px; font-weight: bold; color: #1e8e3e;"></span>
+                </div>
+                <!-- Yeni Tabloya Gönder Butonu -->
+                <button id="send-to-table-btn" class="primary-button" style="width: 100%; margin-top: 10px;">Verileri Tabloya Gönder</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="sidepanel.js"></script>
+</body>
+</html> 

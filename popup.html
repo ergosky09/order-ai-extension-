@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Order AI</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="header">
+        <img src="images/icon.png" alt="icon" class="logo">
+        <h2>Seller Order AI</h2>
+    </div>
+
+    <hr>
+
+    <!-- Ana Menü Görünümü -->
+    <div id="main-view">
+        <div class="menu-list">
+            <button id="toggle-side-panel-btn" class="menu-item">
+                <span class="icon">📖</span>
+                <span class="text">Yan Paneli Aç/Kapat</span>
+            </button>
+             <button id="go-to-categories-btn" class="menu-item">
+                <span class="icon">🗂️</span>
+                <span class="text">Kategori Sorgulama</span>
+            </button>
+            <button id="go-to-seller-query-btn" class="menu-item">
+                <span class="icon">🧑‍💼</span>
+                <span class="text">Satıcı Sorgulama</span>
+            </button>
+            <button id="go-to-test-view-btn" class="menu-item">
+                <span class="icon">🧪</span>
+                <span class="text">Keepa URL ile Alma</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Kategori Sorgulama Görünümü (Başlangıçta gizli) -->
+    <div id="categories-view" style="display: none;">
+        <div class="view-header">
+            <button class="back-button">← Geri</button>
+            <h3>Kategori Sorgulama</h3>
+            <button id="go-to-settings-from-cat-btn" class="header-action-btn">Keepa Ayarları</button>
+        </div>
+        <div class="category-controls">
+            <button id="add-current-category-btn" class="action-button">Aktif Kategoriyi Ekle</button>
+            <button id="add-new-list-btn" class="action-button secondary-button">+ Yeni Liste</button>
+        </div>
+        <div id="category-tabs" class="tabs">
+            <!-- Sekmeler buraya dinamik olarak eklenecek -->
+        </div>
+        <div id="category-list-container" class="list-container">
+            <!-- Kategoriler veya boş durum mesajı buraya gelecek -->
+        </div>
+        <div class="category-actions">
+            <button id="query-selected-btn" class="action-button save-button">Seçilenleri Sorgula</button>
+        </div>
+        <div class="result-controls" style="display: none;">
+            <button id="show-last-result-btn" class="action-button secondary-button">Son Sonuçları Göster</button>
+            <button id="delete-results-btn" class="action-button danger-button">Sonuçları Sil</button>
+            <button id="shuffle-results-btn" class="action-button">Sonuçları Karıştır</button>
+        </div>
+        <div id="query-status" style="text-align: center; margin-top: 10px; display: none;"></div>
+        
+        <!-- Çoklu kolon sonuçları artık burada gösterilecek -->
+        <div id="multi-column-results-container" class="multi-column-container" style="display: none;"></div>
+    </div>
+
+    <!-- Satıcı Sorgulama Görünümü (Başlangıçta gizli, kategori görünümünün kopyası) -->
+    <div id="seller-query-view" style="display: none;">
+        <div class="view-header">
+            <button class="back-button">← Geri</button>
+            <h3>Satıcı Sorgulama</h3>
+        </div>
+        <div class="category-controls">
+            <button id="add-current-seller-btn" class="action-button">Aktif Satıcıyı Ekle</button>
+            <button id="add-new-seller-list-btn" class="action-button secondary-button">Yeni Liste</button>
+        </div>
+        <div id="seller-tabs-container" class="tabs">
+            <!-- Satıcı listesi sekmeleri buraya dinamik olarak eklenecek -->
+        </div>
+        <div id="seller-list-container" class="list-container">
+            <!-- Satıcılar buraya render edilecek -->
+        </div>
+
+        <div class="category-actions">
+            <button id="query-sellers-btn" class="action-button primary">Seçilenleri Sorgula</button>
+            <div style="display: flex; align-items: center; margin-left: 15px;">
+                <input type="checkbox" id="force-live-seller-query-checkbox" style="margin-right: 5px;" title="Keepa'nın önbelleğini atlayıp doğrudan Amazon'dan canlı veri çekmeyi zorunlu kılar. Ek token maliyeti olabilir.">
+                <label for="force-live-seller-query-checkbox" style="font-size: 12px; color: #374151;">Canlı Veri Zorla</label>
+            </div>
+        </div>
+
+        <!-- Sonuçlar Bölümü -->
+        <div id="seller-results-section" style="display: none; margin-top: 15px;">
+            <div class="results-actions">
+                <button id="toggle-seller-results-btn" class="action-button">Sonuçları Gizle</button>
+                <button id="copy-all-seller-asins-btn" class="action-button">Tümünü Kopyala</button>
+                <button id="shuffle-seller-asins-btn" class="action-button">Karıştır</button>
+                <button id="delete-all-seller-results-btn" class="action-button danger-button">Tüm Sonuçları Sil</button>
+            </div>
+            <div id="seller-query-status" style="margin-bottom: 10px; text-align: center;"></div>
+            <div id="seller-results-container" class="multi-column-container">
+                <!-- Satıcı sonuç kolonları buraya render edilecek -->
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Ayarlar Görünümü (Başlangıçta gizli) -->
+    <div id="settings-view" style="display: none;">
+        <div class="view-header">
+            <button class="back-button">← Geri</button>
+            <h3>Keepa Ayarları</h3>
+            <button id="go-to-categories-from-settings-btn" class="header-action-btn">Kategori Sorgulama</button>
+        </div>
+        <div class="settings-scroll-container">
+            <!-- Genel Filtreler -->
+            <div class="form-section">
+                <h4>Genel Filtreler</h4>
+                <div class="form-group">
+                    <label for="keepa-api-key">Keepa API Anahtarı:</label>
+                    <input type="password" id="keepa-api-key" placeholder="API Anahtarınızı Girin">
+                </div>
+                <div class="form-group">
+                    <label for="country-select">Pazar Yeri:</label>
+                    <select id="country-select" name="country"></select>
+                </div>
+                <div class="setting-row">
+                    <label>Satış Sırası (Rank):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-rank" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-rank" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Buybox Fiyat Aralığı ($):</label>
+                    <div class="input-group-with-checkbox">
+                        <div class="input-group">
+                            <input type="number" id="min-buybox-price" class="setting-input" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="max-buybox-price" class="setting-input" placeholder="Max">
+                        </div>
+                        <label class="side-checkbox-label">
+                            <input type="checkbox" id="buybox-out-of-stock-checkbox"> Buybox fiyatı olmayanlar
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Amazon Fiyat Aralığı ($):</label>
+                    <div class="input-group-with-checkbox">
+                        <div class="input-group">
+                            <input type="number" id="min-amazon-price" class="setting-input" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="max-amazon-price" class="setting-input" placeholder="Max">
+                        </div>
+                         <label class="side-checkbox-label">
+                            <input type="checkbox" id="amazon-out-of-stock-checkbox"> Amazon fiyatı olmayanlar
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>FBA Fiyat Aralığı ($):</label>
+                    <div class="input-group-with-checkbox">
+                        <div class="input-group">
+                            <input type="number" id="min-fba-price" class="setting-input" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="max-fba-price" class="setting-input" placeholder="Max">
+                        </div>
+                         <label class="side-checkbox-label">
+                            <input type="checkbox" id="fba-out-of-stock-checkbox"> FBA fiyatı olmayanlar
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>FBM Fiyat Aralığı ($):</label>
+                    <div class="input-group-with-checkbox">
+                        <div class="input-group">
+                            <input type="number" id="min-fbm-price" class="setting-input" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="max-fbm-price" class="setting-input" placeholder="Max">
+                        </div>
+                         <label class="side-checkbox-label">
+                            <input type="checkbox" id="fbm-out-of-stock-checkbox"> FBM fiyatı olmayanlar
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>En Düşük Yeni Fiyat ($):</label>
+                    <div class="input-group-with-checkbox">
+                        <div class="input-group">
+                            <input type="number" id="min-new-price" class="setting-input" placeholder="Min">
+                            <span>-</span>
+                            <input type="number" id="max-new-price" class="setting-input" placeholder="Max">
+                        </div>
+                         <label class="side-checkbox-label">
+                            <input type="checkbox" id="new-price-out-of-stock-checkbox"> Fiyatı olmayanlar
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Sabit Kupon Tutarı ($):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-coupon-absolute" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-coupon-absolute" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Kuponun Yüzdesel İndirimi (%):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-coupon-percent" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-coupon-percent" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Subscribe & Save (%):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-sns-percent" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-sns-percent" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Business Discount (%):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-business-discount" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-business-discount" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Yorum Sayısı:</label>
+                    <div class="input-group">
+                        <input type="number" id="min-rating-count" class="setting-input" placeholder="Min">
+                        <span>-</span>
+                        <input type="number" id="max-rating-count" class="setting-input" placeholder="Max">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Ürün Puanı (1-5):</label>
+                    <div class="input-group">
+                        <input type="number" id="min-rating" class="setting-input" placeholder="Min" min="0" max="5" step="0.1">
+                        <span>-</span>
+                        <input type="number" id="max-rating" class="setting-input" placeholder="Max" min="0" max="5" step="0.1">
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Aylık Satış Adedi:</label>
+                    <div class="input-group">
+                        <input type="number" id="min-monthly-sold" class="setting-input" placeholder="Min" min="10" step="1">
+                        <span>-</span>
+                        <input type="number" id="max-monthly-sold" class="setting-input" placeholder="Max" step="1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="asin-count-input">ASIN Sayısı:</label>
+                    <input type="number" id="asin-count-input" class="setting-input" min="1" max="10000" placeholder="örn: 100">
+                </div>
+            </div>
+
+            <!-- Satıcı ve Teklif Sayıları -->
+            <div class="form-section">
+                <h4>Satıcı & Teklif Sayıları</h4>
+                <div class="form-group">
+                    <label>Eski-Yeni Dahil Tüm Teklifler:</label>
+                    <div class="min-max-group">
+                        <input type="number" id="min-total-offers" placeholder="Min">
+                        <input type="number" id="max-total-offers" placeholder="Max">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Toplam Yeni Teklif Sayısı:</label>
+                    <div class="min-max-group">
+                        <input type="number" id="min-new-offers" placeholder="Min">
+                        <input type="number" id="max-new-offers" placeholder="Max">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Toplam FBA Teklif Sayısı:</label>
+                    <div class="min-max-group">
+                        <input type="number" id="min-fba-offers" placeholder="Min">
+                        <input type="number" id="max-fba-offers" placeholder="Max">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Toplam FBM Teklif Sayısı:</label>
+                    <div class="min-max-group">
+                        <input type="number" id="min-fbm-offers" placeholder="Min">
+                        <input type="number" id="max-fbm-offers" placeholder="Max">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gelişmiş Filtreler -->
+            <div class="form-section">
+                <h4>Gelişmiş Filtreler</h4>
+                <div class="setting-row">
+                    <label>Ürün Tipleri:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" class="product-type-checkbox" value="0"> Fiziksel</label>
+                        <label><input type="checkbox" class="product-type-checkbox" value="1"> Dijital</label>
+                        <label><input type="checkbox" class="product-type-checkbox" value="2"> E-Kitap</label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>Varyasyon Durumu:</label>
+                    <div class="radio-group" id="variation-status-group">
+                        <label><input type="radio" name="variation-status" value="all" checked> Tümü</label>
+                        <label><input type="radio" name="variation-status" value="no"> Varyasyonsuz</label>
+                        <label><input type="radio" name="variation-status" value="yes"> Varyasyonlu</label>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <label>&nbsp;</label> <!-- for alignment -->
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="single-variation-checkbox"> Her üründen sadece bir varyasyon göster</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="save-keepa-settings-btn" class="action-button save-button">Ayarları Kaydet</button>
+        <div id="status-message"></div>
+    </div>
+    
+    <!-- Sonuçlar Görünümü (Başlangıçta gizli) -->
+    <div id="results-view" style="display: none;">
+        <div class="view-header">
+            <button class="back-button">← Geri</button>
+            <h3>Sorgu Sonucu <span id="single-result-count" class="count-badge"></span></h3>
+        </div>
+        <div class="results-actions">
+            <button id="copy-single-result-btn" class="action-button">Sonucu Kopyala</button>
+        </div>
+        <!-- En son yapılan sorgunun sonucu burada gösterilecek -->
+        <div id="single-result-container" class="list-container"></div>
+    </div>
+
+    <!-- Test Görünümü (Başlangıçta gizli) -->
+    <div id="test-view" style="display: none;">
+        <div class="view-header">
+            <button class="back-button">← Geri</button>
+            <h3>Keepa URL ile Alma</h3>
+        </div>
+        <div class="test-controls">
+             <p>Bu bölüm, API bağlantısını test etmek içindir.</p>
+            <button id="start-test-query-btn" class="action-button">1. Token Sorgula</button>
+            <hr style="margin: 15px 0;">
+            <p>Aşağıdaki alana, içinde `YOUR_API_KEY` yer tutucusu bulunan tam Keepa URL'sini yapıştırın ve sorgulayın.</p>
+            <textarea id="user-url-input" placeholder="https://api.keepa.com/query?key=YOUR_API_KEY..."></textarea>
+            <button id="start-user-url-test-btn" class="action-button">2. Kullanıcı URL'si ile Sorgula</button>
+        </div>
+        <div id="test-query-status" style="text-align: center; margin-top: 10px; display: none;"></div>
+        <div id="test-multi-column-results-container" class="multi-column-container" style="display: none;">
+            <!-- Test sonuç kolonları buraya render edilecek -->
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html> 
